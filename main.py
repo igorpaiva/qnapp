@@ -3,10 +3,46 @@ from tkinter import messagebox
 import json
 import os
 
+class MainMenu:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Main Menu")
+        
+        self.create_menu()
+
+    def create_menu(self):
+        """Sets up the main menu with Play, Create Deck, and Quit options."""
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # Title label
+        title_label = tk.Label(self.root, text="Question & Answer Game", font=("Arial", 24))
+        title_label.pack(pady=20)
+
+        # Play button (can be implemented later)
+        play_button = tk.Button(self.root, text="Play", font=("Arial", 14), command=self.play_game)
+        play_button.pack(pady=10)
+
+        # Create Deck button (open the QnApp)
+        create_deck_button = tk.Button(self.root, text="Create Deck", font=("Arial", 14), command=self.open_deck_creator)
+        create_deck_button.pack(pady=10)
+
+        # Quit button
+        quit_button = tk.Button(self.root, text="Quit", font=("Arial", 14), command=self.root.quit)
+        quit_button.pack(pady=10)
+
+    def play_game(self):
+        """Placeholder for the game itself"""
+        messagebox.showinfo("Play", "Game not implemented yet!")
+
+    def open_deck_creator(self):
+        """Opens the deck creator interface"""
+        QnApp(self.root)
+
 class QnApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("QnApp")
+        self.root.title("Create Deck")
 
         # TODO: let the user choose the file name
         self.file_name = "qna.json"
@@ -26,13 +62,13 @@ class QnApp:
 
         self.row = 0
 
-        # Display card's ID
-        self.question_id_label = tk.Label(self.root, text=f'Card ID: {self.question_id}')
-        self.question_id_label.grid(row=self.row, column=0)
+        # Back to Menu button
+        back_button = tk.Button(self.root, text="Back to Menu", command=self.back_to_menu)
+        back_button.grid(row=self.row, column=0)
 
         self.increment_row()
 
-        # Create question entry
+        # Question entry
         self.question_label = tk.Label(self.root, text="Question:")
         self.question_label.grid(row=self.row, column=0)
 
@@ -41,7 +77,7 @@ class QnApp:
 
         self.increment_row()
 
-        # Create answers frame
+        # Answers frame
         self.answers_frame = tk.Frame(self.root)
         self.answers_frame.grid(row=self.row, column=0, columnspan=2)
 
@@ -53,8 +89,7 @@ class QnApp:
 
         self.increment_row()
 
-        # Button to save the data
-
+        # Save button
         self.save_button = tk.Button(self.root, text="Save", command=self.save_data)
         self.save_button.grid(row=self.row, column=1, sticky='e')
 
@@ -65,7 +100,7 @@ class QnApp:
         self.add_answer_field()
 
     def increment_row(self):
-        self.row = self.row+1
+        self.row += 1
 
     def get_next_question_id(self):
         """Returns the next available question ID by checking existing data in the JSON file."""
@@ -73,10 +108,8 @@ class QnApp:
             with open(self.file_name, "r") as f:
                 data = json.load(f)
             if data:
-                # Find the highest existing ID and return the next one
                 max_id = max(entry["id"] for entry in data)
                 return max_id + 1
-        # If file doesn't exist or is empty, start from 1
         return 1
 
     def add_answer_field(self):
@@ -123,11 +156,10 @@ class QnApp:
         with open(self.file_name, "w") as f:
             json.dump(data, f, indent=4)
 
-        # Increment question ID for the next entry
         self.question_id += 1
-
-        # Show success message
         messagebox.showinfo("Success", "Data saved successfully!")
-
-        # Refresh the UI after saving (to display the next card's ID)
         self.create_ui()
+
+    def back_to_menu(self):
+        """Go back to the main menu."""
+        MainMenu(self.root)
